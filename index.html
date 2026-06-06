@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NestWay – Student PG Finder</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --accent: #e94560;
+      --accent2: #f5a623;
+      --light-bg: #f7f7fb;
+      --card-bg: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--light-bg);
+      color: var(--text);
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: var(--primary);
+      padding: 14px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .navbar-brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: #fff !important;
+      letter-spacing: -0.5px;
+    }
+    .navbar-brand span { color: var(--accent); }
+    .nav-link {
+      color: rgba(255,255,255,0.75) !important;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #fff !important; }
+    .btn-signup {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .btn-signup:hover { background: #c73652; transform: translateY(-1px); color:#fff; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #16213e 50%, #0f3460 100%);
+      padding: 70px 0 50px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      border-radius: 50%;
+    }
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-subtitle {
+      color: rgba(255,255,255,0.65);
+      font-size: 1.1rem;
+      margin-top: 12px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .stat-box { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent2);
+    }
+    .stat-label { color: rgba(255,255,255,0.55); font-size: 0.8rem; margin-top: 2px; }
+
+    /* ── SEARCH / FILTER BAR ── */
+    .filter-bar {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 20px 24px;
+      margin-top: -30px;
+      position: relative;
+      z-index: 10;
+    }
+    .filter-bar label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .filter-bar .form-select,
+    .filter-bar .form-control {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      transition: border-color 0.2s;
+    }
+    .filter-bar .form-select:focus,
+    .filter-bar .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+    .btn-search {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 28px;
+      font-weight: 600;
+      width: 100%;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-search:hover { background: #c73652; transform: translateY(-1px); }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .section-title span { color: var(--accent); }
+    .result-count {
+      font-size: 0.88rem;
+      color: var(--muted);
+      background: var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── PROPERTY CARD ── */
+    .property-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+      position: relative;
+    }
+    .property-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .card-img-wrap {
+      position: relative;
+      overflow: hidden;
+      height: 200px;
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+    .property-card:hover .card-img-wrap img { transform: scale(1.06); }
+
+    .badge-gender {
+      position: absolute;
+      top: 12px; left: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-boys  { background: #dbeafe; color: #1d4ed8; }
+    .badge-girls { background: #fce7f3; color: #be185d; }
+    .badge-co    { background: #d1fae5; color: #065f46; }
+
+    .btn-wishlist {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: transform 0.2s, color 0.2s;
+      color: var(--muted);
+    }
+    .btn-wishlist:hover, .btn-wishlist.active {
+      color: var(--accent);
+      transform: scale(1.15);
+    }
+
+    .card-body-custom { padding: 18px; }
+    .prop-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prop-location {
+      font-size: 0.83rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .prop-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+    .prop-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .prop-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .prop-price small { font-size: 0.75rem; color: var(--muted); font-family: 'DM Sans'; font-weight: 400; }
+    .prop-rating {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.82rem; font-weight: 600;
+      color: #92400e;
+      background: #fef3c7;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .prop-amenities {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .amenity-tag {
+      background: var(--light-bg);
+      color: var(--muted);
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .btn-view-details {
+      display: block;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      border: none;
+      border-radius: 0 0 14px 14px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn-view-details:hover { background: var(--accent); color: #fff; }
+
+    /* ── PAGINATION ── */
+    .pagination .page-link {
+      border-radius: 8px !important;
+      margin: 0 2px;
+      color: var(--primary);
+      border-color: var(--border);
+      font-weight: 500;
+    }
+    .pagination .page-item.active .page-link {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.6);
+      padding: 30px 0;
+      margin-top: 60px;
+      text-align: center;
+      font-size: 0.88rem;
+    }
+    footer span { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .property-card {
+      animation: fadeUp 0.4s ease both;
+    }
+    .property-card:nth-child(1) { animation-delay: 0.05s; }
+    .property-card:nth-child(2) { animation-delay: 0.10s; }
+    .property-card:nth-child(3) { animation-delay: 0.15s; }
+    .property-card:nth-child(4) { animation-delay: 0.20s; }
+    .property-card:nth-child(5) { animation-delay: 0.25s; }
+    .property-card:nth-child(6) { animation-delay: 0.30s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 576px) {
+      .hero { padding: 50px 0 40px; }
+      .filter-bar { margin-top: 16px; border-radius: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#">Nest<span>Way</span></a>
+
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="bi bi-list text-white fs-4"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-2 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Listings</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+        <li class="nav-item">
+          <a class="btn btn-signup ms-2" href="signup.html">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="hero-title">Find Your Perfect<br><span>Student PG</span> in Minutes</h1>
+        <p class="hero-subtitle">Browse verified PG accommodations near your college — affordable, safe, and comfortable.</p>
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-num">500+</div>
+            <div class="stat-label">PG Listed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">20+</div>
+            <div class="stat-label">Cities</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">5K+</div>
+            <div class="stat-label">Happy Students</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FILTER BAR ══════════════ -->
+<section class="py-0">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3 col-sm-6">
+          <label for="cityFilter">City</label>
+          <select id="cityFilter" class="form-select">
+            <option value="">All Cities</option>
+            <option value="Bhubaneswar">Bhubaneswar</option>
+            <option value="Pune">Pune</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Mumbai">Mumbai</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label for="budgetFilter">Max Budget</label>
+          <select id="budgetFilter" class="form-select">
+            <option value="">Any Budget</option>
+            <option value="5000">Under ₹5,000</option>
+            <option value="8000">Under ₹8,000</option>
+            <option value="12000">Under ₹12,000</option>
+            <option value="20000">Under ₹20,000</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label for="genderFilter">Gender</label>
+          <select id="genderFilter" class="form-select">
+            <option value="">Any Gender</option>
+            <option value="boys">Boys</option>
+            <option value="girls">Girls</option>
+            <option value="co-ed">Co-Ed</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label>&nbsp;</label>
+          <button class="btn btn-search" onclick="applyFilters()">
+            <i class="bi bi-search me-2"></i>Search PGs
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ LISTINGS ══════════════ -->
+<section class="py-5 mt-2">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Available <span>PGs</span></h2>
+      <span class="result-count" id="resultCount">6 results</span>
+    </div>
+
+    <div class="row g-4" id="propertyGrid">
+
+      <!-- Card 1 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Bhubaneswar" data-price="7500" data-gender="boys">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80" alt="Sunrise Boys PG"/>
+            <span class="badge-gender badge-boys">Boys</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Sunrise Boys PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Patia, Bhubaneswar</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-cup-hot"></i> Meals</span>
+              <span class="amenity-tag"><i class="bi bi-fan"></i> AC</span>
+              <span class="amenity-tag"><i class="bi bi-tv"></i> TV</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹7,500 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.3</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Pune" data-price="9000" data-gender="girls">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&q=80" alt="Blossom Girls PG"/>
+            <span class="badge-gender badge-girls">Girls</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Blossom Girls PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Kothrud, Pune</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-cup-hot"></i> Meals</span>
+              <span class="amenity-tag"><i class="bi bi-shield-check"></i> Security</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹9,000 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.6</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Bangalore" data-price="11000" data-gender="co-ed">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80" alt="Urban Nest Co-Ed PG"/>
+            <span class="badge-gender badge-co">Co-Ed</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Urban Nest Co-Ed PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Koramangala, Bangalore</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-dumbbell"></i> Gym</span>
+              <span class="amenity-tag"><i class="bi bi-fan"></i> AC</span>
+              <span class="amenity-tag"><i class="bi bi-car-front"></i> Parking</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹11,000 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.8</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Delhi" data-price="6500" data-gender="boys">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80" alt="Capital Boys PG"/>
+            <span class="badge-gender badge-boys">Boys</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Capital Boys PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Laxmi Nagar, Delhi</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-cup-hot"></i> Meals</span>
+              <span class="amenity-tag"><i class="bi bi-lightning-charge"></i> Power Backup</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹6,500 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.1</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Mumbai" data-price="13000" data-gender="girls">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80" alt="Seaside Girls PG"/>
+            <span class="badge-gender badge-girls">Girls</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Seaside Girls PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Andheri, Mumbai</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-fan"></i> AC</span>
+              <span class="amenity-tag"><i class="bi bi-shield-check"></i> Security</span>
+              <span class="amenity-tag"><i class="bi bi-cup-hot"></i> Meals</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹13,000 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.7</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="col-xl-4 col-md-6 property-col"
+           data-city="Bhubaneswar" data-price="5500" data-gender="co-ed">
+        <div class="property-card h-100">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80" alt="Green Valley PG"/>
+            <span class="badge-gender badge-co">Co-Ed</span>
+            <button class="btn-wishlist" onclick="toggleWishlist(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+          <div class="card-body-custom">
+            <div class="prop-name">Green Valley PG</div>
+            <div class="prop-location"><i class="bi bi-geo-alt-fill text-danger"></i> Nayapalli, Bhubaneswar</div>
+            <div class="prop-amenities">
+              <span class="amenity-tag"><i class="bi bi-wifi"></i> WiFi</span>
+              <span class="amenity-tag"><i class="bi bi-bicycle"></i> Cycle Stand</span>
+              <span class="amenity-tag"><i class="bi bi-cup-hot"></i> Meals</span>
+            </div>
+            <hr class="prop-divider"/>
+            <div class="prop-footer">
+              <div class="prop-price">₹5,500 <small>/month</small></div>
+              <div class="prop-rating"><i class="bi bi-star-fill"></i> 4.0</div>
+            </div>
+          </div>
+          <a href="property-detail.html" class="btn-view-details">View Details →</a>
+        </div>
+      </div>
+
+    </div><!-- /row -->
+
+    <!-- No results message -->
+    <div id="noResults" class="text-center py-5 d-none">
+      <i class="bi bi-search display-3 text-muted"></i>
+      <p class="mt-3 text-muted fs-5">No PGs match your filters. Try adjusting them.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-5">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <p>© 2025 <span>NestWay</span> – Built with ❤️ for Students</p>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // ── WISHLIST TOGGLE ──
+  function toggleWishlist(btn) {
+    btn.classList.toggle('active');
+    const icon = btn.querySelector('i');
+    if (btn.classList.contains('active')) {
+      icon.className = 'bi bi-heart-fill';
+    } else {
+      icon.className = 'bi bi-heart';
+    }
+  }
+
+  // ── FILTER LOGIC ──
+  function applyFilters() {
+    const city   = document.getElementById('cityFilter').value.toLowerCase();
+    const budget = document.getElementById('budgetFilter').value;
+    const gender = document.getElementById('genderFilter').value.toLowerCase();
+
+    const cards = document.querySelectorAll('.property-col');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const cardCity   = card.dataset.city.toLowerCase();
+      const cardPrice  = parseInt(card.dataset.price);
+      const cardGender = card.dataset.gender.toLowerCase();
+
+      const cityMatch   = !city   || cardCity === city;
+      const budgetMatch = !budget || cardPrice <= parseInt(budget);
+      const genderMatch = !gender || cardGender === gender;
+
+      if (cityMatch && budgetMatch && genderMatch) {
+        card.style.display = '';
+        visible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    document.getElementById('resultCount').textContent = visible + ' result' + (visible !== 1 ? 's' : '');
+    document.getElementById('noResults').classList.toggle('d-none', visible > 0);
+  }
+</script>
+
+</body>
+</html>

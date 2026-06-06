@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NestWay – My Shortlist</title>
+  <!-- React 18 + Babel (for JSX in browser) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f7f7fb; }
+  </style>
+</head>
+<body>
+
+  <!-- React mounts here -->
+  <div id="root"></div>
+
+  <script type="text/babel">
+  // ============================================================
+  //  NestWay – React Shortlist Component
+  //  Embedded inline so it works without a build tool
+  // ============================================================
+
+  const { useState } = React;
+
+  // ── Sample data (in real project → fetched from PHP API) ──
+  const SAMPLE_SHORTLIST = [
+    {
+      id: 1, name: "Sunrise Boys PG", city: "Bhubaneswar",
+      address: "Patia, Bhubaneswar", price: 7500, gender: "boys", rating: 4.3,
+      amenities: ["WiFi", "3 Meals/Day", "AC", "TV Lounge"],
+      image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80",
+      markedAt: "2025-03-15"
+    },
+    {
+      id: 3, name: "Urban Nest Co-Ed PG", city: "Bangalore",
+      address: "Koramangala, Bangalore", price: 11000, gender: "co-ed", rating: 4.8,
+      amenities: ["WiFi", "Gym", "AC", "Parking"],
+      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80",
+      markedAt: "2025-03-18"
+    },
+    {
+      id: 5, name: "Seaside Girls PG", city: "Mumbai",
+      address: "Andheri, Mumbai", price: 13000, gender: "girls", rating: 4.7,
+      amenities: ["WiFi", "AC", "Security", "3 Meals/Day"],
+      image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80",
+      markedAt: "2025-03-20"
+    },
+    {
+      id: 6, name: "Green Valley PG", city: "Bhubaneswar",
+      address: "Nayapalli, Bhubaneswar", price: 5500, gender: "co-ed", rating: 4.0,
+      amenities: ["WiFi", "3 Meals/Day", "Cycle Stand"],
+      image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80",
+      markedAt: "2025-03-22"
+    }
+  ];
+
+  const GENDER_STYLES = {
+    boys:    { bg: "#dbeafe", color: "#1d4ed8", label: "Boys" },
+    girls:   { bg: "#fce7f3", color: "#be185d", label: "Girls" },
+    "co-ed": { bg: "#d1fae5", color: "#065f46", label: "Co-Ed" }
+  };
+
+  // ── Stars ──
+  function Stars({ rating }) {
+    return (
+      <span style={{ color: "#f5a623", fontSize: "0.82rem" }}>
+        {"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}
+      </span>
+    );
+  }
+
+  // ── Single Card ──
+  function ShortlistCard({ pg, onRemove, index }) {
+    const [removing, setRemoving] = useState(false);
+    const [hovered, setHovered]   = useState(false);
+    const gs = GENDER_STYLES[pg.gender] || GENDER_STYLES["co-ed"];
+
+    function handleRemove() {
+      setRemoving(true);
+      setTimeout(() => onRemove(pg.id), 350);
+    }
+
+    return (
+      <div style={{
+        background: "#fff", borderRadius: 18, overflow: "hidden",
+        border: "1.5px solid #e5e7eb",
+        boxShadow: hovered ? "0 16px 40px rgba(0,0,0,0.12)" : "0 4px 20px rgba(0,0,0,0.06)",
+        transition: "transform 0.3s, box-shadow 0.3s, opacity 0.35s",
+        opacity: removing ? 0 : 1,
+        transform: removing ? "scale(0.93)" : hovered ? "translateY(-4px)" : "translateY(0)",
+      }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {/* Image */}
+        <div style={{ position: "relative", height: 185, overflow: "hidden" }}>
+          <img src={pg.image} alt={pg.name}
+            style={{ width: "100%", height: "100%", objectFit: "cover",
+              transform: hovered ? "scale(1.06)" : "scale(1)", transition: "transform 0.4s" }}
+          />
+          <span style={{
+            position: "absolute", top: 12, left: 12,
+            background: gs.bg, color: gs.color,
+            padding: "4px 12px", borderRadius: 20, fontSize: "0.72rem",
+            fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px"
+          }}>{gs.label}</span>
+          <button onClick={handleRemove} title="Remove"
+            style={{
+              position: "absolute", top: 10, right: 10,
+              background: "#fff", border: "none", borderRadius: "50%",
+              width: 34, height: 34, cursor: "pointer", color: "#e94560",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "0.9rem", fontWeight: 700,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+            }}>✕</button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: 16 }}>
+          <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "1rem",
+            marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {pg.name}
+          </div>
+          <div style={{ fontSize: "0.82rem", color: "#6b7280" }}>📍 {pg.address}</div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 10 }}>
+            {pg.amenities.slice(0, 3).map(a => (
+              <span key={a} style={{
+                background: "#f7f7fb", color: "#6b7280", fontSize: "0.7rem",
+                padding: "3px 8px", borderRadius: 20, border: "1px solid #e5e7eb"
+              }}>{a}</span>
+            ))}
+          </div>
+
+          <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "12px 0" }}/>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <span style={{ fontFamily: "'Syne',sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#e94560" }}>
+                ₹{pg.price.toLocaleString()}
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>/month</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4,
+              background: "#fef3c7", padding: "3px 10px", borderRadius: 20 }}>
+              <Stars rating={pg.rating}/>
+              <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#92400e" }}>{pg.rating}</span>
+            </div>
+          </div>
+
+          <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: 8 }}>
+            🔖 Shortlisted {new Date(pg.markedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+          </div>
+        </div>
+
+        <a href={`property-detail.php?id=${pg.id}`}
+          style={{ display: "block", background: "#1a1a2e", color: "#fff",
+            textAlign: "center", padding: 11, textDecoration: "none",
+            fontWeight: 600, fontSize: "0.88rem",
+            transition: "background 0.2s" }}
+          onMouseOver={e => e.currentTarget.style.background = "#e94560"}
+          onMouseOut={e => e.currentTarget.style.background = "#1a1a2e"}
+        >View Details →</a>
+      </div>
+    );
+  }
+
+  // ── Empty State ──
+  function EmptyState() {
+    return (
+      <div style={{ textAlign: "center", padding: "80px 20px" }}>
+        <div style={{ fontSize: "4rem", marginBottom: 16 }}>🏠</div>
+        <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, marginBottom: 8, fontSize: "1.4rem" }}>
+          No PGs Shortlisted Yet
+        </h3>
+        <p style={{ color: "#6b7280", marginBottom: 24 }}>
+          Browse listings and click <strong>"Shortlist This PG"</strong> to save your favourites.
+        </p>
+        <a href="index.php" style={{
+          background: "#e94560", color: "#fff", padding: "12px 28px",
+          borderRadius: 10, textDecoration: "none", fontWeight: 700
+        }}>Browse PGs →</a>
+      </div>
+    );
+  }
+
+  // ── Compare Bar ──
+  function CompareBar({ count, onClear }) {
+    if (count < 2) return null;
+    return (
+      <div style={{
+        position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+        background: "#1a1a2e", color: "#fff", borderRadius: 14,
+        padding: "14px 24px", display: "flex", alignItems: "center", gap: 14,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.35)", zIndex: 999
+      }}>
+        <span style={{ fontSize: "0.9rem" }}>⚖️ <strong>{count}</strong> PGs selected</span>
+        <button style={{ background: "#e94560", color: "#fff", border: "none",
+          borderRadius: 8, padding: "8px 18px", fontWeight: 700, cursor: "pointer" }}>
+          Compare Now
+        </button>
+        <button onClick={onClear} style={{ background: "none", border: "none",
+          color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "1.1rem" }}>✕</button>
+      </div>
+    );
+  }
+
+  // ── MAIN APP ──
+  function ShortlistApp() {
+    const [shortlist, setShortlist] = useState(SAMPLE_SHORTLIST);
+    const [sortBy, setSortBy]       = useState("date");
+    const [cityFilter, setCityFilter] = useState("all");
+    const [search, setSearch]       = useState("");
+    const [selected, setSelected]   = useState([]);
+    const [toast, setToast]         = useState("");
+
+    function showToast(msg) {
+      setToast(msg);
+      setTimeout(() => setToast(""), 3000);
+    }
+
+    function handleRemove(id) {
+      const pg = shortlist.find(p => p.id === id);
+      setShortlist(prev => prev.filter(p => p.id !== id));
+      setSelected(prev => prev.filter(s => s !== id));
+      showToast(`💔 "${pg?.name}" removed`);
+    }
+
+    function toggleSelect(id) {
+      setSelected(prev =>
+        prev.includes(id)
+          ? prev.filter(s => s !== id)
+          : prev.length < 3 ? [...prev, id] : prev
+      );
+    }
+
+    const cities = ["all", ...new Set(shortlist.map(p => p.city))];
+
+    const displayed = shortlist
+      .filter(p => cityFilter === "all" || p.city === cityFilter)
+      .filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.city.toLowerCase().includes(search.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (sortBy === "price_asc")  return a.price - b.price;
+        if (sortBy === "price_desc") return b.price - a.price;
+        if (sortBy === "rating")     return b.rating - a.rating;
+        return new Date(b.markedAt) - new Date(a.markedAt);
+      });
+
+    const totalCost = shortlist.reduce((s, p) => s + p.price, 0);
+
+    const ctrlStyle = (active) => ({
+      background: active ? "#fff5f7" : "#fff",
+      border: `1.5px solid ${active ? "#e94560" : "#e5e7eb"}`,
+      color: active ? "#e94560" : "#374151",
+      borderRadius: 10, padding: "8px 14px",
+      fontSize: "0.83rem", fontWeight: 500,
+      cursor: "pointer", transition: "all 0.2s"
+    });
+
+    return (
+      <div style={{ minHeight: "100vh", background: "#f7f7fb" }}>
+        {/* CSS */}
+        <style>{`
+          @keyframes slideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+          .pg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 22px;
+          }
+          @media(max-width:600px){ .pg-grid { grid-template-columns: 1fr; } }
+        `}</style>
+
+        {/* HEADER */}
+        <div style={{ background: "linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%)", padding: "40px 0 28px" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+            <a href="index.php" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem",
+              textDecoration: "none", display: "inline-block", marginBottom: 18 }}>
+              ← Back to Listings
+            </a>
+            <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16, alignItems: "flex-start" }}>
+              <div>
+                <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800,
+                  fontSize: "clamp(1.8rem,4vw,2.6rem)", color: "#fff", lineHeight: 1.2 }}>
+                  My <span style={{ color: "#e94560" }}>Shortlist</span>
+                </h1>
+                <p style={{ color: "rgba(255,255,255,0.5)", marginTop: 6, fontSize: "0.92rem" }}>
+                  {shortlist.length} PG{shortlist.length !== 1 ? "s" : ""} saved · Compare and choose the best
+                </p>
+              </div>
+              {shortlist.length > 0 && (
+                <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 14,
+                  padding: "14px 22px", border: "1px solid rgba(255,255,255,0.12)", textAlign: "right" }}>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.45)",
+                    textTransform: "uppercase", letterSpacing: 1 }}>Total Monthly</div>
+                  <div style={{ fontFamily: "'Syne',sans-serif", fontSize: "1.9rem",
+                    fontWeight: 800, color: "#f5a623" }}>₹{totalCost.toLocaleString()}</div>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>across {shortlist.length} PGs</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* CONTROLS */}
+        {shortlist.length > 0 && (
+          <div style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "12px 0" }}>
+            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px",
+              display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+
+              {/* Search */}
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: 11, top: "50%",
+                  transform: "translateY(-50%)", fontSize: "0.85rem", color: "#9ca3af" }}>🔍</span>
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search..."
+                  style={{ border: "1.5px solid #e5e7eb", borderRadius: 10,
+                    padding: "8px 12px 8px 32px", fontSize: "0.85rem", outline: "none",
+                    width: 190, background: "#fff" }}
+                />
+              </div>
+
+              {/* City filter pills */}
+              {cities.map(c => (
+                <button key={c} onClick={() => setCityFilter(c)} style={ctrlStyle(cityFilter === c)}>
+                  {c === "all" ? "All Cities" : c}
+                </button>
+              ))}
+
+              {/* Sort */}
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+                style={{ border: "1.5px solid #e5e7eb", borderRadius: 10, padding: "8px 12px",
+                  fontSize: "0.83rem", background: "#fff", cursor: "pointer", outline: "none",
+                  color: "#374151" }}>
+                <option value="date">Newest First</option>
+                <option value="price_asc">Price ↑</option>
+                <option value="price_desc">Price ↓</option>
+                <option value="rating">Top Rated</option>
+              </select>
+
+              {/* Clear all */}
+              <button onClick={() => { setShortlist([]); showToast("🗑️ Shortlist cleared!"); }}
+                style={{ ...ctrlStyle(false), marginLeft: "auto", color: "#e94560", borderColor: "#fecdd3" }}>
+                Clear All
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* CARDS */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 20px 120px" }}>
+          {shortlist.length === 0
+            ? <EmptyState />
+            : displayed.length === 0
+            ? (
+              <div style={{ textAlign: "center", padding: "60px", color: "#6b7280" }}>
+                <p>No results.
+                  <button onClick={() => { setSearch(""); setCityFilter("all"); }}
+                    style={{ background: "none", border: "none", color: "#e94560",
+                      cursor: "pointer", fontWeight: 600, marginLeft: 6 }}>
+                    Clear filters
+                  </button>
+                </p>
+              </div>
+            )
+            : (
+              <div className="pg-grid">
+                {displayed.map((pg, i) => (
+                  <div key={pg.id} style={{ position: "relative",
+                    animation: `slideIn 0.4s ease ${i * 0.08}s both` }}>
+                    {/* Compare pill */}
+                    <button
+                      onClick={() => toggleSelect(pg.id)}
+                      style={{
+                        position: "absolute", top: -10, right: 12, zIndex: 10,
+                        background: selected.includes(pg.id) ? "#e94560" : "#fff",
+                        color: selected.includes(pg.id) ? "#fff" : "#6b7280",
+                        border: `1.5px solid ${selected.includes(pg.id) ? "#e94560" : "#e5e7eb"}`,
+                        borderRadius: 20, padding: "3px 12px",
+                        fontSize: "0.72rem", fontWeight: 600, cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}>
+                      {selected.includes(pg.id) ? "✓ Selected" : "+ Compare"}
+                    </button>
+                    <ShortlistCard pg={pg} onRemove={handleRemove} index={i}/>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        </div>
+
+        {/* COMPARE BAR */}
+        <CompareBar count={selected.length} onClear={() => setSelected([])}/>
+
+        {/* TOAST */}
+        {toast && (
+          <div style={{
+            position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",
+            background: "#1a1a2e", color: "#fff", padding: "11px 24px",
+            borderRadius: 12, fontSize: "0.88rem", fontWeight: 600,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.3)", zIndex: 9999,
+            whiteSpace: "nowrap"
+          }}>{toast}</div>
+        )}
+      </div>
+    );
+  }
+
+  // Mount React app into #root
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<ShortlistApp/>);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NestWay – Property Detail</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --accent:  #e94560;
+      --accent2: #f5a623;
+      --light-bg: #f7f7fb;
+      --card-bg:  #ffffff;
+      --text:    #1a1a2e;
+      --muted:   #6b7280;
+      --border:  #e5e7eb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--light-bg); color: var(--text); }
+
+    /* ── NAVBAR (same as index) ── */
+    .navbar { background: var(--primary); padding: 14px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+    .navbar-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: #fff !important; }
+    .navbar-brand span { color: var(--accent); }
+    .nav-link { color: rgba(255,255,255,0.75) !important; font-weight: 500; }
+    .nav-link:hover { color: #fff !important; }
+    .btn-signup { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; }
+    .btn-signup:hover { background: #c73652; color:#fff; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb-wrap {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .breadcrumb-item a { color: var(--accent); text-decoration: none; font-size: 0.88rem; }
+    .breadcrumb-item.active { font-size: 0.88rem; color: var(--muted); }
+    .breadcrumb-item + .breadcrumb-item::before { color: var(--muted); }
+
+    /* ── IMAGE GALLERY ── */
+    .gallery-main {
+      border-radius: 16px;
+      overflow: hidden;
+      height: 420px;
+      cursor: pointer;
+      position: relative;
+    }
+    .gallery-main img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+    .gallery-main:hover img { transform: scale(1.03); }
+    .gallery-thumb-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .gallery-thumb {
+      border-radius: 10px;
+      overflow: hidden;
+      height: 90px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, opacity 0.2s;
+    }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-thumb.active { border-color: var(--accent); }
+    .gallery-thumb:hover { opacity: 0.85; }
+
+    /* ── PROPERTY HEADER ── */
+    .prop-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .prop-title { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1.2; }
+    .prop-location-row { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+    .badge-gender-lg { padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-boys  { background: #dbeafe; color: #1d4ed8; }
+    .badge-girls { background: #fce7f3; color: #be185d; }
+    .badge-co    { background: #d1fae5; color: #065f46; }
+
+    /* ── RATING STRIP ── */
+    .rating-strip {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 16px 22px; margin: 18px 0;
+    }
+    .rating-item { text-align: center; }
+    .rating-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
+    .rating-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .stars { color: var(--accent2); font-size: 0.85rem; }
+
+    /* ── PRICE BOX ── */
+    .price-box {
+      background: linear-gradient(135deg, var(--primary), #0f3460);
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .price-tag { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--accent2); }
+    .price-tag small { font-size: 1rem; color: rgba(255,255,255,0.6); font-family: 'DM Sans'; font-weight: 400; }
+    .price-includes { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .btn-interested {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 18px;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Syne', sans-serif;
+    }
+    .btn-interested:hover { background: #c73652; transform: translateY(-2px); }
+    .btn-interested.marked {
+      background: #065f46;
+    }
+    .btn-shortlist {
+      width: 100%;
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-shortlist:hover { background: rgba(255,255,255,0.1); }
+    .price-info-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 14px; margin-top: 14px;
+      font-size: 0.82rem; color: rgba(255,255,255,0.65);
+    }
+    .price-info-row span:last-child { color: #fff; font-weight: 600; }
+
+    /* ── SECTION CARD ── */
+    .info-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .info-card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    /* ── AMENITIES ── */
+    .amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .amenity-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 14px 10px;
+      background: var(--light-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.82rem;
+      color: var(--text);
+      gap: 6px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .amenity-item:hover { border-color: var(--accent); background: #fff5f7; }
+    .amenity-item i { font-size: 1.4rem; color: var(--accent); }
+
+    /* ── RULES ── */
+    .rule-list { list-style: none; padding: 0; }
+    .rule-list li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .rule-list li:last-child { border-bottom: none; }
+    .rule-list li i { color: var(--accent); font-size: 1rem; }
+
+    /* ── REVIEWS ── */
+    .review-card {
+      background: var(--light-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .reviewer-name { font-weight: 600; font-size: 0.9rem; }
+    .review-date { font-size: 0.78rem; color: var(--muted); }
+    .review-text { font-size: 0.88rem; color: var(--muted); margin-top: 6px; }
+    .review-stars { color: var(--accent2); font-size: 0.8rem; }
+
+    /* ── MAP PLACEHOLDER ── */
+    .map-box {
+      background: linear-gradient(135deg, #e0e7ff, #f0fdf4);
+      border-radius: 12px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+      border: 1.5px dashed var(--border);
+    }
+    .map-box i { font-size: 2rem; color: var(--accent); }
+
+    /* ── ANIMATION ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate { animation: fadeUp 0.5s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    footer { background: var(--primary); color: rgba(255,255,255,0.6); padding: 28px 0; margin-top: 60px; text-align: center; font-size: 0.88rem; }
+    footer span { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .gallery-main { height: 260px; }
+      .gallery-thumb-row { grid-template-columns: repeat(4, 1fr); }
+      .gallery-thumb { height: 65px; }
+      .prop-title { font-size: 1.4rem; }
+      .price-box { position: static; margin-top: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Nest<span>Way</span></a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="bi bi-list text-white fs-4"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-2 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html">Listings</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+        <li class="nav-item"><a class="btn btn-signup ms-2" href="signup.html">Sign Up</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── BREADCRUMB ── -->
+<div class="breadcrumb-wrap">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item"><a href="index.html">Listings</a></li>
+        <li class="breadcrumb-item active">Sunrise Boys PG</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<section class="py-4">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- LEFT COLUMN -->
+      <div class="col-lg-8">
+
+        <!-- IMAGE GALLERY -->
+        <div class="animate">
+          <div class="gallery-main" id="mainImg">
+            <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=900&q=80" alt="Main" id="mainImgSrc"/>
+          </div>
+          <div class="gallery-thumb-row">
+            <div class="gallery-thumb active" onclick="changeImg(this, 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80')">
+              <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=200&q=80" alt="t1"/>
+            </div>
+            <div class="gallery-thumb" onclick="changeImg(this, 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&q=80')">
+              <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&q=80" alt="t2"/>
+            </div>
+            <div class="gallery-thumb" onclick="changeImg(this, 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=900&q=80')">
+              <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=200&q=80" alt="t3"/>
+            </div>
+            <div class="gallery-thumb" onclick="changeImg(this, 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=900&q=80')">
+              <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=200&q=80" alt="t4"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROPERTY HEADER -->
+        <div class="mt-4 animate delay-1">
+          <div class="prop-header">
+            <div>
+              <h1 class="prop-title">Sunrise Boys PG</h1>
+              <div class="prop-location-row">
+                <i class="bi bi-geo-alt-fill text-danger"></i>
+                <span>Plot 42, Patia, Bhubaneswar, Odisha – 751024</span>
+              </div>
+            </div>
+            <span class="badge-gender-lg badge-boys">Boys Only</span>
+          </div>
+
+          <!-- RATING STRIP -->
+          <div class="rating-strip">
+            <div class="rating-item">
+              <div class="rating-value" style="color:var(--accent2)">4.3</div>
+              <div class="stars">★★★★☆</div>
+              <div class="rating-label">Overall</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value">4.5</div>
+              <div class="rating-label">Cleanliness</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value">4.1</div>
+              <div class="rating-label">Food</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value">4.6</div>
+              <div class="rating-label">Location</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value">4.2</div>
+              <div class="rating-label">Safety</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value" style="color:var(--accent)">48</div>
+              <div class="rating-label">Reviews</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="info-card animate delay-2">
+          <div class="info-card-title">About This PG</div>
+          <p style="font-size:0.95rem; color:var(--muted); line-height:1.8;">
+            Sunrise Boys PG is a well-maintained, fully-furnished accommodation located in the heart of Patia, one of Bhubaneswar's most student-friendly neighborhoods. Just 10 minutes from KIIT University and 15 minutes from BPUT, it offers a safe, comfortable and focused environment for students.
+          </p>
+          <p style="font-size:0.95rem; color:var(--muted); line-height:1.8; margin-top:10px;">
+            The PG offers both single and double sharing rooms, all equipped with beds, study tables, wardrobes, and high-speed WiFi. Three nutritious meals are served daily by an in-house cook. Regular housekeeping and 24×7 security ensure a hassle-free stay.
+          </p>
+        </div>
+
+        <!-- AMENITIES -->
+        <div class="info-card animate delay-2">
+          <div class="info-card-title">Amenities</div>
+          <div class="amenity-grid">
+            <div class="amenity-item"><i class="bi bi-wifi"></i>High-Speed WiFi</div>
+            <div class="amenity-item"><i class="bi bi-cup-hot-fill"></i>3 Meals/Day</div>
+            <div class="amenity-item"><i class="bi bi-fan"></i>Air Conditioning</div>
+            <div class="amenity-item"><i class="bi bi-tv-fill"></i>TV Lounge</div>
+            <div class="amenity-item"><i class="bi bi-lightning-charge-fill"></i>Power Backup</div>
+            <div class="amenity-item"><i class="bi bi-shield-fill-check"></i>24×7 Security</div>
+            <div class="amenity-item"><i class="bi bi-droplet-fill"></i>Hot Water</div>
+            <div class="amenity-item"><i class="bi bi-bicycle"></i>Cycle Stand</div>
+            <div class="amenity-item"><i class="bi bi-book-fill"></i>Study Room</div>
+            <div class="amenity-item"><i class="bi bi-washing-machine"></i>Laundry</div>
+            <div class="amenity-item"><i class="bi bi-camera-video-fill"></i>CCTV</div>
+            <div class="amenity-item"><i class="bi bi-phone-fill"></i>Warden Support</div>
+          </div>
+        </div>
+
+        <!-- HOUSE RULES -->
+        <div class="info-card animate delay-3">
+          <div class="info-card-title">House Rules</div>
+          <ul class="rule-list">
+            <li><i class="bi bi-check-circle-fill"></i> Gate closing time: 10:00 PM</li>
+            <li><i class="bi bi-check-circle-fill"></i> No smoking or alcohol on premises</li>
+            <li><i class="bi bi-check-circle-fill"></i> Visitors allowed in common area only (before 8 PM)</li>
+            <li><i class="bi bi-check-circle-fill"></i> Meals served at fixed timings: 8 AM, 1 PM, 8 PM</li>
+            <li><i class="bi bi-check-circle-fill"></i> One month advance deposit required</li>
+            <li><i class="bi bi-x-circle-fill" style="color:#e94560"></i> No loud music after 10 PM</li>
+            <li><i class="bi bi-x-circle-fill" style="color:#e94560"></i> Outside guests not permitted after 8 PM</li>
+          </ul>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="info-card animate delay-3">
+          <div class="info-card-title">Student Reviews</div>
+
+          <div class="review-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="reviewer-name">Rohit Sharma</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <div class="review-date">2nd Year, KIIT University · March 2025</div>
+            <p class="review-text">Really nice place. Food is good and WiFi is fast. The warden is very helpful. Totally recommended for KIIT students!</p>
+          </div>
+
+          <div class="review-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="reviewer-name">Aman Patel</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <div class="review-date">3rd Year, SOA University · January 2025</div>
+            <p class="review-text">Good value for money. Rooms are clean and spacious. Power backup works well. Gate timings are strict but manageable.</p>
+          </div>
+
+          <div class="review-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="reviewer-name">Suresh Kumar</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <div class="review-date">1st Year, BPUT · November 2024</div>
+            <p class="review-text">Very safe neighborhood. Study room is a big plus. Would love if they added a gym in the future.</p>
+          </div>
+        </div>
+
+        <!-- MAP -->
+        <div class="info-card animate delay-3">
+          <div class="info-card-title">Location</div>
+          <div class="map-box">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span style="font-weight:600;">Patia, Bhubaneswar</span>
+            <span style="font-size:0.82rem;">Map will be embedded via Google Maps API</span>
+          </div>
+          <div class="d-flex gap-3 mt-3 flex-wrap" style="font-size:0.85rem; color:var(--muted);">
+            <span><i class="bi bi-building me-1 text-danger"></i>KIIT University – 2.1 km</span>
+            <span><i class="bi bi-train-front me-1 text-danger"></i>Bhubaneswar Railway – 8 km</span>
+            <span><i class="bi bi-hospital me-1 text-danger"></i>AIIMS Bhubaneswar – 5 km</span>
+          </div>
+        </div>
+
+      </div><!-- /LEFT COLUMN -->
+
+      <!-- RIGHT COLUMN – PRICE BOX -->
+      <div class="col-lg-4">
+        <div class="price-box animate delay-2">
+          <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px;">Starting From</div>
+          <div class="price-tag">₹7,500 <small>/month</small></div>
+          <div class="price-includes">Includes: WiFi, 3 Meals, Housekeeping</div>
+
+          <hr style="border-color:rgba(255,255,255,0.15); margin: 18px 0 14px;"/>
+
+          <!-- Room Types -->
+          <div style="font-size:0.85rem; color:rgba(255,255,255,0.55); margin-bottom:8px;">Select Room Type</div>
+          <div class="d-flex flex-column gap-2" id="roomOptions">
+            <label class="room-option d-flex justify-content-between align-items-center" style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 14px; cursor:pointer; font-size:0.88rem; color:#fff; transition:border-color 0.2s;">
+              <span><input type="radio" name="room" value="7500" checked style="accent-color:var(--accent); margin-right:8px;"> Double Sharing</span>
+              <span style="color:var(--accent2); font-weight:700;">₹7,500</span>
+            </label>
+            <label class="room-option d-flex justify-content-between align-items-center" style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 14px; cursor:pointer; font-size:0.88rem; color:#fff;">
+              <span><input type="radio" name="room" value="10000" style="accent-color:var(--accent); margin-right:8px;"> Single Room</span>
+              <span style="color:var(--accent2); font-weight:700;">₹10,000</span>
+            </label>
+            <label class="room-option d-flex justify-content-between align-items-center" style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 14px; cursor:pointer; font-size:0.88rem; color:#fff;">
+              <span><input type="radio" name="room" value="5500" style="accent-color:var(--accent); margin-right:8px;"> Triple Sharing</span>
+              <span style="color:var(--accent2); font-weight:700;">₹5,500</span>
+            </label>
+          </div>
+
+          <div class="price-info-row">
+            <span>Availability</span>
+            <span>✅ 3 Rooms Left</span>
+          </div>
+          <div class="price-info-row">
+            <span>Security Deposit</span>
+            <span>₹5,000 (one-time)</span>
+          </div>
+          <div class="price-info-row">
+            <span>Notice Period</span>
+            <span>1 Month</span>
+          </div>
+
+          <button class="btn-interested" id="interestedBtn" onclick="markInterested()">
+            <i class="bi bi-heart me-2" id="interestedIcon"></i>I'm Interested
+          </button>
+          <button class="btn-shortlist" onclick="toggleShortlist(this)">
+            <i class="bi bi-bookmark me-2" id="shortlistIcon"></i><span id="shortlistText">Shortlist This PG</span>
+          </button>
+
+          <div style="text-align:center; margin-top:18px; font-size:0.8rem; color:rgba(255,255,255,0.4);">
+            <i class="bi bi-shield-check me-1"></i>Verified PG · No Brokerage
+          </div>
+        </div>
+
+        <!-- CONTACT BOX -->
+        <div class="info-card mt-3 animate delay-3">
+          <div class="info-card-title">Contact Owner</div>
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem;">
+              <i class="bi bi-person-fill"></i>
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:0.95rem;">Mr. Ramesh Panda</div>
+              <div style="font-size:0.8rem; color:var(--muted);">Property Owner</div>
+            </div>
+          </div>
+          <a href="tel:+919876543210" class="btn d-block mt-3 text-white fw-600" style="background:var(--primary); border-radius:10px; padding:10px; font-weight:600; font-size:0.9rem; text-decoration:none;">
+            <i class="bi bi-telephone-fill me-2"></i>+91 98765 43210
+          </a>
+          <a href="#" class="btn d-block mt-2 fw-600" style="background:var(--light-bg); color:var(--text); border-radius:10px; padding:10px; font-weight:600; font-size:0.9rem; border:1.5px solid var(--border); text-decoration:none;">
+            <i class="bi bi-chat-dots-fill me-2 text-success"></i>Chat on WhatsApp
+          </a>
+        </div>
+
+      </div><!-- /RIGHT COLUMN -->
+
+    </div><!-- /row -->
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>© 2025 <span>NestWay</span> – Built with ❤️ for Students</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ── IMAGE GALLERY ──
+  function changeImg(thumb, url) {
+    document.getElementById('mainImgSrc').src = url;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+
+  // ── MARK INTERESTED ──
+  let interested = false;
+  function markInterested() {
+    interested = !interested;
+    const btn  = document.getElementById('interestedBtn');
+    const icon = document.getElementById('interestedIcon');
+    if (interested) {
+      btn.classList.add('marked');
+      btn.innerHTML = '<i class="bi bi-heart-fill me-2"></i>Interest Marked ✓';
+    } else {
+      btn.classList.remove('marked');
+      btn.innerHTML = '<i class="bi bi-heart me-2"></i>I\'m Interested';
+    }
+  }
+
+  // ── SHORTLIST ──
+  let shortlisted = false;
+  function toggleShortlist(btn) {
+    shortlisted = !shortlisted;
+    document.getElementById('shortlistText').textContent = shortlisted ? 'Shortlisted ✓' : 'Shortlist This PG';
+    document.getElementById('shortlistIcon').className = shortlisted ? 'bi bi-bookmark-fill me-2' : 'bi bi-bookmark me-2';
+    btn.style.borderColor = shortlisted ? 'var(--accent2)' : '';
+    btn.style.color = shortlisted ? 'var(--accent2)' : '';
+  }
+</script>
+</body>
+</html>
